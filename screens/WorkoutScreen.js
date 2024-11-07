@@ -59,7 +59,7 @@ const WorkOutScreen = () => {
           </Pressable>
         </View>
 
-        {route.params.excersises.map((item, index) => (
+        {route?.params?.excersises?.map((item, index) => (
           <Pressable
             style={{ margin: 10, flexDirection: "row", alignItems: "center" }}
             key={index}

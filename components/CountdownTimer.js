@@ -12,7 +12,6 @@ const CountdownTimer = ({ expiryDate }) => {
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
         minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
       };
     }
 
@@ -31,7 +30,7 @@ const CountdownTimer = ({ expiryDate }) => {
 
   const renderTimer = () => {
     return Object.keys(timeLeft).length > 0 ? (
-      <Text className="text-light my-2">{`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}</Text>
+      <Text className="text-light my-2">{`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m `}</Text>
     ) : (
       <Text className="text-light my-2">Subscription Expired</Text>
     );

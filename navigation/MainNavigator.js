@@ -9,6 +9,7 @@ import Account from "../screens/Account";
 import StudentEditPage from "../screens/StudentEditPage";
 import ImageUpload from "../components/ImageUpload";
 import ChangePassword from "../components/ChangePassword";
+import SetNotification from "../screens/SetNotification";
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,11 @@ const MainNavigator = () => {
       <Stack.Screen
         name="Try Premium"
         component={Purchases}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen
+        name="Notification"
+        component={SetNotification}
         options={{ headerShown: true }}
       />
 

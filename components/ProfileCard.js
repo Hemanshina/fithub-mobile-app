@@ -12,6 +12,9 @@ const ProfileCard = ({ user }) => {
   const goToEditPage = () => {
     return navigation.navigate("Edit Profile", { user });
   };
+  const goToNotificationPage = () => {
+    return navigation.navigate("Notification");
+  };
 
   return (
     <View
@@ -31,12 +34,21 @@ const ProfileCard = ({ user }) => {
           <Text style={styles.userName}>{user?.name}</Text>
         </View>
       </View>
-      <TouchableOpacity
-        onPress={() => goToEditPage()}
-        style={styles.viewProfileButton}
-      >
-        <Text style={styles.viewProfileButtonText}>Edit Profile</Text>
-      </TouchableOpacity>
+      <View className="flex flex-row">
+        <TouchableOpacity
+          onPress={() => goToEditPage()}
+          style={styles.viewProfileButton}
+        >
+          <Text style={styles.viewProfileButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => goToNotificationPage()}
+          style={styles.notificationBtn}
+          className="mx-1 border "
+        >
+          <Text>Schedule Workout Reminder</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -67,6 +79,14 @@ const styles = StyleSheet.create({
   },
   viewProfileButton: {
     backgroundColor: "#206320",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  notificationBtn: {
+    backgroundColor: "#fff",
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 8,
