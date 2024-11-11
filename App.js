@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthProvider";
 import { NavigationContainer } from "@react-navigation/native";
 import ToastManager from "toastify-react-native";
+import { NativeBaseProvider } from "native-base";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -14,9 +15,11 @@ export default function App() {
       <AuthProvider>
         <FitnessContext>
           <NavigationContainer>
-            <ToastManager />
-            <StatusBar backgroundColor="#206320" barStyle="light-content" />
-            <StackNavigator />
+            <NativeBaseProvider>
+              <ToastManager />
+              <StatusBar backgroundColor="#206320" barStyle="light-content" />
+              <StackNavigator />
+            </NativeBaseProvider>
           </NavigationContainer>
         </FitnessContext>
       </AuthProvider>

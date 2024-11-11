@@ -39,10 +39,11 @@ const HomeScreen = () => {
             HOME WORKOUT
           </Text>
 
-          <Pressable className="flex flex-row items-center gap-1 "
-          onPress={()=>{
-            navigation.navigate("Account")
-          }}
+          <Pressable
+            className="flex flex-row items-center gap-1 "
+            onPress={() => {
+              navigation.navigate("Account");
+            }}
           >
             <Text className="font-bold text-light">{auth?.name}</Text>
 

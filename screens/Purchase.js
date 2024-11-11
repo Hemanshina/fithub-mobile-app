@@ -88,7 +88,7 @@ const Purchases = () => {
                     <Text className="text-light text-xl font-bold ">
                       ${item?.amount}
                     </Text>
-                    <Text className="ml-1 text-light">/ Month</Text>
+                    <Text className="ml-1 text-light">/ {item?.per}</Text>
                   </View>
                   <View className="mb-2">
                     <Pressable

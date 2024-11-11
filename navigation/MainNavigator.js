@@ -1,6 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
+import Home from "../screens/Home";
 import WorkOutScreen from "../screens/WorkoutScreen";
 import FitScreen from "../screens/FitScreen";
 import RestScreen from "../screens/RestScreen";
@@ -10,13 +11,15 @@ import StudentEditPage from "../screens/StudentEditPage";
 import ImageUpload from "../components/ImageUpload";
 import ChangePassword from "../components/ChangePassword";
 import SetNotification from "../screens/SetNotification";
+import Plan from "../screens/Plan";
+import LogWeight from "../screens/LogWeight";
 
 const Stack = createNativeStackNavigator();
 
 const MainNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName={HomeScreen}
+      initialRouteName={Home}
       screenOptions={{
         headerStyle: {
           backgroundColor: "#206320",
@@ -29,13 +32,23 @@ const MainNavigator = () => {
     >
       <Stack.Screen
         name="Home"
-        component={HomeScreen}
+        component={Home}
         options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Workout"
         component={WorkOutScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MealPlan"
+        component={Plan}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="LogWeight"
+        component={LogWeight}
+        options={{ headerShown: true }}
       />
       <Stack.Screen
         name="Fit"
