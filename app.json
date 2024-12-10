@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Home workout",
-    "slug": "home-workout",
+    "name": "FitHub",
+    "slug": "fithub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.saudmud_home_work_planner",
@@ -33,7 +33,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "e3bce492-9d01-4dff-b4df-97191e5d6441"
+        "projectId": "ac3a69d5-24bf-4988-9cee-e99f4a301982"
       }
     }
   }

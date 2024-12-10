@@ -1,30 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, Alert, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  Alert,
+  StyleSheet,
+  Platform,
+  Pressable,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 const SetNotification = () => {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date()); // Holds the selected date
+  const [time, setTime] = useState(new Date()); // Holds the selected time
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [reminders, setReminders] = useState([]);
-  
 
   useEffect(() => {
-    // Load stored reminders on component mount
     loadReminders();
 
-    // Add notification response listener
     const subscription = Notifications.addNotificationResponseReceivedListener(
       async (response) => {
-        // Dismiss the notification from the tray
         await Notifications.dismissNotificationAsync(
           response.notification.request.identifier
         );
       }
     );
 
-    // Cleanup listener on component unmount
     return () => {
       subscription.remove();
     };
@@ -43,30 +49,40 @@ const SetNotification = () => {
 
   const handleSetReminder = async () => {
     try {
-      // Schedule notification
+      const combinedDateTime = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes()
+      );
+
+      if (combinedDateTime <= new Date()) {
+        Alert.alert(
+          "Invalid Date/Time",
+          "Please select a future date and time."
+        );
+        return;
+      }
+
       const identifier = await Notifications.scheduleNotificationAsync({
         content: {
           title: "Workout Reminder",
           body: "Time for your workout!",
-          sound: "default", // Add sound here
+          sound: "default",
         },
-        trigger: {
-          hour: date.getHours(),
-          minute: date.getMinutes(),
-          repeats: true, // Daily reminder
-        },
+        trigger: combinedDateTime,
       });
 
-      const newReminder = { id: identifier, date };
+      const newReminder = { id: identifier, dateTime: combinedDateTime };
       const updatedReminders = [...reminders, newReminder];
 
-      // Save reminder to AsyncStorage
       await AsyncStorage.setItem("reminders", JSON.stringify(updatedReminders));
       setReminders(updatedReminders);
 
       Alert.alert(
         "Reminder Set",
-        `Your reminder is set for ${date.toLocaleTimeString()}`
+        `Your reminder is set for ${combinedDateTime.toLocaleString()}`
       );
     } catch (error) {
       console.log("Error setting reminder:", error);
@@ -75,7 +91,6 @@ const SetNotification = () => {
 
   const handleRemoveReminder = async (id) => {
     try {
-      // Cancel notification
       await Notifications.cancelScheduledNotificationAsync(id);
 
       const updatedReminders = reminders.filter(
@@ -83,67 +98,82 @@ const SetNotification = () => {
       );
       setReminders(updatedReminders);
 
-      // Update AsyncStorage
       await AsyncStorage.setItem("reminders", JSON.stringify(updatedReminders));
     } catch (error) {
       console.log("Error removing reminder:", error);
     }
   };
 
-  const showDatePickerHandler = () => {
-    setShowDatePicker(true);
+  const handleDateChange = (event, selectedDate) => {
+    if (event.type === "set" && selectedDate) {
+      setDate(selectedDate);
+    }
+    setShowDatePicker(false);
   };
 
-  const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
+  const handleTimeChange = (event, selectedTime) => {
+    if (event.type === "set" && selectedTime) {
+      setTime(selectedTime);
+    }
+    setShowTimePicker(false);
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-        Set Workout Reminder
+    <View style={styles.container}>
+      <Text style={styles.header}>Set Workout Reminder</Text>
+
+      {/* Buttons for Selecting Date and Time */}
+      <View className="flex-row justify-between items-center ">
+        <Pressable
+          className="bg-primary w-[45%] px-3 py-2 rounded-md   "
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text className="text-center text-light ">Choose Date</Text>
+        </Pressable>
+        <Pressable
+          className="bg-primary w-[45%] px-3 py-2 rounded-md   "
+          onPress={() => setShowTimePicker(true)}
+        >
+          <Text className="text-center text-light ">Choose Time</Text>
+        </Pressable>
+      </View>
+
+      {/* Display Selected Date and Time */}
+      <Text style={styles.selectedDateText}>{`Selected Date & Time:`}</Text>
+      <Text className="my-3 font-bold text-md ">
+        {`${date.toLocaleDateString()} At ${time.toLocaleTimeString()}`}
       </Text>
 
-      <Button title="Choose Date & Time" onPress={showDatePickerHandler} />
-
-      {/* Display selected date */}
-      <Text style={styles.selectedDateText}>
-        {date && `Selected Date: ${date.toLocaleTimeString()}`}
-      </Text>
-
+      {/* DateTimePickers */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
-          mode="time"
-          display="default"
+          mode="date"
+          display={Platform.OS === "ios" ? "inline" : "default"}
           onChange={handleDateChange}
+        />
+      )}
+      {showTimePicker && (
+        <DateTimePicker
+          value={time}
+          mode="time"
+          display={Platform.OS === "ios" ? "inline" : "default"}
+          onChange={handleTimeChange}
         />
       )}
 
       {/* Button to Set Reminder */}
-      <Button
-        title="Set Reminder"
-        onPress={handleSetReminder}
-        style={styles.setReminderButton}
-      />
+      <Button title="Set Reminder" onPress={handleSetReminder} />
 
-      <Text style={{ marginTop: 20, fontSize: 18 }}>Existing Reminders:</Text>
+      <Text style={styles.remindersHeader}>Existing Reminders:</Text>
       <FlatList
         data={reminders}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 5,
-            }}
-          >
+          <View style={styles.reminderItem}>
             <Text>{`Reminder at: ${new Date(
-              item.date
-            ).toLocaleTimeString()}, Daily`}</Text>
+              item.dateTime
+            ).toLocaleString()}`}</Text>
             <Button
               title="Remove"
               onPress={() => handleRemoveReminder(item.id)}
@@ -156,13 +186,28 @@ const SetNotification = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
   selectedDateText: {
     fontSize: 16,
     marginVertical: 10,
     color: "#555",
   },
-  setReminderButton: {
+  remindersHeader: {
     marginTop: 20,
+    fontSize: 18,
+  },
+  reminderItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 5,
+    alignItems: 'center',
   },
 });
 

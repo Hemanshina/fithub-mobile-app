@@ -11,7 +11,7 @@ import React, { useCallback, useState } from "react";
 import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart, LineChart } from "react-native-gifted-charts";
+import { BarChart } from "react-native-gifted-charts";
 import { useNavigation } from "@react-navigation/native";
 
 const Progress = () => {
@@ -53,11 +53,31 @@ const Progress = () => {
 
   const logs = logsData?.data?.logs || [];
 
-  // Prepare data for the chart
-  const chartData = logs.map((log) => ({
-    value: log.weight,
-    label: new Date(log.createdAt).toLocaleDateString(),
-  }));
+  // Prepare data for the chart with both weight and BMI
+  const chartData = logs.flatMap((log) => {
+    const heightInMeters = log.height / 100;
+    const bmi = (log.weight / (heightInMeters * heightInMeters)).toFixed(2);
+    const dateLabel = new Date(log.createdAt).toLocaleDateString();
+
+    return [
+      {
+        value: log.weight,
+        label: dateLabel,
+        frontColor: "#4a90e2",
+        customDataPoint: {
+          label: "Weight",
+        },
+      },
+      {
+        value: parseFloat(bmi),
+        label: dateLabel,
+        frontColor: "#ff0000",
+        customDataPoint: {
+          label: "BMI",
+        },
+      },
+    ];
+  });
 
   return (
     <ScrollView
@@ -67,14 +87,28 @@ const Progress = () => {
       contentContainerStyle={{ padding: 16 }}
     >
       <View>
-        <Text className="text-lg font-bold my-2">Manage Progress</Text>
+        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+          Manage Progress
+        </Text>
       </View>
       {!logs?.length ? (
-        <View className="bg-light py-10 rounded-md ">
-          <Text className="text-center my-1 italic font-bold ">
+        <View
+          style={{
+            paddingVertical: 20,
+            borderRadius: 8,
+            backgroundColor: "#f0f0f0",
+          }}
+        >
+          <Text
+            style={{
+              textAlign: "center",
+              fontStyle: "italic",
+              fontWeight: "bold",
+            }}
+          >
             You have not added your weight
           </Text>
-          <Text className="text-center my-1 italic  ">
+          <Text style={{ textAlign: "center", fontStyle: "italic" }}>
             Add/Log your weight to Manage
           </Text>
         </View>
@@ -82,22 +116,38 @@ const Progress = () => {
         <View>
           {/* Chart */}
           <View style={{ marginBottom: 24 }}>
+            <Text className="mt-3 mb-2 font-bold   ">
+              Weight & BMI progress bar chart
+            </Text>
             <BarChart
               data={chartData}
-              width={300}
-              height={200}
-              color="#4a90e2"
+              width={350}
+              height={300}
+              barWidth={15}
+              barBorderRadius={4}
+              spacing={30}
+              noOfSections={4}
               isAnimated
-              spacing={50}
               yAxisLabelWidth={40}
               yAxisTextStyle={{ color: "#999" }}
               xAxisTextStyle={{ color: "#999" }}
               xAxisLabelTextStyle={{ color: "#999" }}
-              showGradient
-              frontColor={"#1B6BB0"}
-              gradientColor={"#FFEEFE"}
-              backgroundColor={"#FCFAEE"}
+              showXAxisIndices
+              backgroundColor={"#fff"}
+              showYAxisIndices
+              initialSpacing={20}
+              groupedBars={true}
             />
+            <View className="flex-row  my-3 ">
+              <View className="flex-row ml-3 ">
+                <View className="bg-blue-600 px-3 py-1 rounded-sm mr-1  "></View>
+                <Text>-Weight</Text>
+              </View>
+              <View className="flex-row ml-3 ">
+                <View className="bg-red-600 px-3 py-1 rounded-sm mr-1  "></View>
+                <Text>-BMI </Text>
+              </View>
+            </View>
           </View>
 
           {/* Log History Table */}
@@ -121,12 +171,16 @@ const Progress = () => {
             >
               <Text style={{ flex: 1, fontWeight: "bold" }}>Height</Text>
               <Text style={{ flex: 1, fontWeight: "bold" }}>Weight</Text>
+              <Text style={{ flex: 1, fontWeight: "bold" }}>BMI</Text>
               <Text style={{ flex: 1, fontWeight: "bold" }}>Date</Text>
             </View>
             {logs.map((log) => (
               <View key={log._id} style={{ flexDirection: "row", padding: 8 }}>
                 <Text style={{ flex: 1 }}>{log.height} cm</Text>
                 <Text style={{ flex: 1 }}>{log.weight} kg</Text>
+                <Text style={{ flex: 1 }}>
+                  {(log.weight / (log.height / 100) ** 2).toFixed(2)}
+                </Text>
                 <Text style={{ flex: 1 }}>
                   {new Date(log.createdAt).toLocaleDateString()}
                 </Text>

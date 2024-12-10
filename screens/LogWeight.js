@@ -10,6 +10,7 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -24,9 +25,8 @@ const signupSchema = Yup.object().shape({
   height: Yup.number().required("Please enter height"),
 });
 
-
 const LogWeight = () => {
-    const { auth } = useAuth();
+  const { auth } = useAuth();
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -40,10 +40,12 @@ const LogWeight = () => {
     },
     onSuccess: (response) => {
       Toast.success(response?.data?.message || "Success");
+      navigation.navigate("Progress");
     },
 
     onError: (error) => {
       Toast.error(error?.response?.data?.message || "Error");
+      console.log(error);
     },
   });
 
